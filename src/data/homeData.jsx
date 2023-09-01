@@ -1,33 +1,12 @@
 import axios from "axios";
 
-export const alertaDeCanais = [
-  {
-    valor: 1,
-    nome: "Normal",
-    cor: "#005A64",
-  },
-  {
-    valor: 2,
-    nome: "Atenção",
-    cor: "#FFCE00",
-  },
-  {
-    valor: 3,
-    nome: "Perigo",
-    cor: "#FF0000",
-  },
-  {
-    valor: 4,
-    nome: "Todos",
-    cor: "black",
-  },
-];
+
 
 export async function dadosDeVendas() {
   const listaDeVendas = [];
   let allOrders = [];
 
-  for (let page = 1; page <= 5; page++) {
+  for (let page = 1; page <= 20; page++) {
     const response = await axios.get(
       `https://apiv2.leveros.com.br/monitoramento/${page}`,
       {
@@ -51,13 +30,30 @@ export async function dadosDeVendas() {
 //GLOBAL VARIABLES
 
 
-var allOrders = [];
 var orderData = [];
 var estadoDosCanais = [];
+var normal = 0;
+var warning = 0;
+var danger = 0;
+var tempTotalTickets = 0;
+var totalCountTickets = 0;
+
+
+function clearVariables(){
+  orderData= [];
+  estadoDosCanais = [];
+  normal = 0;
+  warning = 0;
+  danger = 0;
+  tempTotalTickets = 0;
+  totalCountTickets = 0;
+}
 
 export async function init(){
-// console.log("allOrders state after update:", allOrders);
+clearVariables();
 var data = await dadosDeVendas();
+
+
 
 let blt = [];
 let bnr = [];
@@ -96,7 +92,7 @@ nmd.push(filterArray("NMD",data));
 nvp.push(filterArray("NVP",data));
 pfz.push(filterArray("PFZ",data));
 
-// console.log(blt[0]);
+
 ecom.push(
   data.filter(
     (item) =>
@@ -134,8 +130,8 @@ tempCompanies.forEach((company) => {
     getData(company);
   }
 });
-
-return orderData;
+manipulatePanelData();
+return [orderData, estadoDosCanais, tempTotalTickets, totalCountTickets];
 }
 
 
@@ -190,6 +186,7 @@ function getData(array) {
     mediumTicket: "",
     notifyWhats: false,
     timeElapsed: [],
+    color: undefined,
   };
 
   let indexArray = 0;
@@ -208,43 +205,61 @@ function getData(array) {
 
       if (sub.affiliateId === "BLT") {
         tempObj.fullNameCompany = "BALAROTI";
+        tempObj.color = "#F2B04"
       } else if (sub.affiliateId === "BNR") {
         tempObj.fullNameCompany = "INTER SHOP";
+        tempObj.color = "#FC7B04"
       } else if (sub.affiliateId === "bww") {
         tempObj.fullNameCompany = "B2W";
+        tempObj.color = "#04EBC3"
       } else if (sub.affiliateId === "CMD") {
         tempObj.fullNameCompany = "CAMICADO";
+        tempObj.color = "#A40413"
       } else if (sub.affiliateId === "CRF") {
         tempObj.fullNameCompany = "CARREFOUR";
+        tempObj.color = '#2852A3'
       } else if (sub.affiliateId === "DKN") {
         tempObj.fullNameCompany = "DAIKIN";
+        tempObj.color = "#049CCC"
       } else if (sub.affiliateId === "FSH") {
         tempObj.fullNameCompany = "FAST SHOP";
+        tempObj.color = "#DB333B"
       } else if (sub.affiliateId === "GLN") {
         tempObj.fullNameCompany = "ANGELONI";
+        tempObj.color = "#0453B3"
       } else if (sub.affiliateId === "LRM") {
         tempObj.fullNameCompany = "LEROY MERLIN";
+        tempObj.color = "#74BC44"
       } else if (sub.affiliateId === "MDM") {
         tempObj.fullNameCompany = "MADEIRA M.";
+        tempObj.color = "#FC9314"
       } else if (sub.affiliateId === "MGZ") {
         tempObj.fullNameCompany = "MAGAZINE LUIZA";
+        tempObj.color = "#0684FA"
       } else if (sub.affiliateId === "MLB") {
         tempObj.fullNameCompany = "MELI CLÁSSICO";
+        tempObj.color = "#F2E31E"
       } else if (sub.affiliateId === "MLP") {
         tempObj.fullNameCompany = "MELI PREMIUM";
+        tempObj.color = "#060E63"
       } else if (sub.affiliateId === "MZN") {
         tempObj.fullNameCompany = "AMAZON";
+        tempObj.color = "#040404"
       } else if (sub.affiliateId === "NMD") {
         tempObj.fullNameCompany = "NOVO MUNDO";
+        tempObj.color = "#04048B"
       } else if (sub.affiliateId === "NVP") {
         tempObj.fullNameCompany = "C-NOVA";
+        tempObj.color = "#E43C0C"
       } else if (sub.affiliateId === "PFZ") {
         tempObj.fullNameCompany = "PROFIZ";
+        tempObj.color = "#A3FB04"
       }
 
       if (sub.orderId.includes("mltr")) {
         tempObj.nameCompany = "SITE";
         tempObj.fullNameCompany = "SITE";
+        tempObj.color = "#045C64"
       } else if (sub.affiliateId === "bww") {
         tempObj.nameCompany = "B2W";
       } else {
@@ -269,7 +284,7 @@ function getData(array) {
     numberTotal /= 100;
     numberMedium /= 100;
 
-    let tempTotalTickets = 0;
+   
     tempTotalTickets += numberTotal;
 
  
@@ -294,7 +309,6 @@ function getData(array) {
 
     //ONLY OBJECTS THAT HAD SOME NEW ORDER IN THE LAST 24H PASS HERE
     if (tempObj.cont > 0) {
-      // console.log(tempObj.cont)
       tempObj.index = indexArray;
       indexArray++;
       orderData.push(tempObj)
@@ -305,23 +319,19 @@ function getData(array) {
   });
 
 
-  // console.log(orderData);
-  // // console.log(alertaDeCanais);
-  // console.log(orderData);
+
 }
+
 
 function hoursManipulated(tempObj) {
   let fullTimeDif = compareHours(tempObj.lastOrder);
   let lessThan3 = false;
   let moreThan3 = false;
   let moreThan5 = false;
-  // // console.log("teste: " )
-  // // console.log(tempObj)
+
 
   //CHECK IF THE LAST ORDER IS SUPERIOR THAN 5 HOURS
-  let normal = 0;
-  let warning = 0;
-  let danger = 0;
+ 
   if (fullTimeDif[0] < 3) {
     lessThan3 = true;
     normal += 1;
@@ -333,7 +343,7 @@ function hoursManipulated(tempObj) {
     danger += 1;
   }
 
-  // // console.log(normal);
+
 
   estadoDosCanais = [normal, warning, danger, normal + warning + danger];
 
@@ -350,4 +360,18 @@ function hoursManipulated(tempObj) {
   timeManipulated.push(moreThan5);
 
   return timeManipulated;
+}
+
+
+function manipulatePanelData() {
+     
+
+  orderData.forEach((company) => {
+    totalCountTickets += company.cont;
+  });
+
+  tempTotalTickets = tempTotalTickets.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }

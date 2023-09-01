@@ -3,6 +3,7 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 
 import "./index.css";
 import Router from "./router/router.jsx";
+import { StrictMode } from "react";
 
 const theme = extendTheme({
   colors: {
@@ -17,6 +18,14 @@ const theme = extendTheme({
       S2: "#CEFFAE",
       S3: "#FFCE00",
     },
+  },
+  breakpoints: {
+    sm: "320px",
+    md: "768px",
+    lg: "960px",
+    xl: "1200px",
+    "2xl": "1536px",
+    pedrao: "1920px",
   },
 });
 

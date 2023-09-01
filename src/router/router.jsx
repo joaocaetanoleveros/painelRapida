@@ -5,7 +5,9 @@ import ScrollToTop from "../utils/scrollToTop";
 import Navbar from "../components/Navbar/navbar";
 import Glpi from "../pages/Glpi/glpi";
 import Pedidos from "../pages/Pedidos/pedidos";
-
+import Login from "../pages/Login/login";
+import WebArt from "../pages/WebArt/webart_v2";
+import Profiz from "../pages/Profiz/profiz";
 
 export default function Router() {
   return (
@@ -15,7 +17,10 @@ export default function Router() {
       <Routes>
         <Route index path="/" element={<Home />} />
         <Route path="/glpi" element={<Glpi />} />
-        <Route path="/pedidos" element={<Pedidos />} />
+        <Route path="/comprouChegou" element={<Pedidos />} />
+        <Route path="/webart" element={<WebArt />} />
+        <Route path="/profiz" element={<Profiz />} />
+        {/* <Route path='/login' element={<Login/>} /> */}
         {/* <Route path="/login" element={<Login />} />
       <Route path="/*" element={<NotFound/>}/> 
       <Route path="/novoLVI"  element={<CountDown/>}/>
